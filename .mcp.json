@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "megaplan": {
+      "command": "npx",
+      "args": ["-y", "@theyahia/megaplan-mcp"],
+      "env": {
+        "MEGAPLAN_DOMAIN": "",
+        "MEGAPLAN_TOKEN": ""
+      }
+    }
+  }
+}
