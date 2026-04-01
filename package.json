@@ -1,12 +1,18 @@
 {
   "name": "@theyahia/megaplan-mcp",
-  "version": "1.0.0",
-  "description": "MCP server for Megaplan — tasks, deals management via API v3.",
+  "version": "1.1.1",
+  "description": "MCP server for Megaplan — tasks, deals, project management (Russia)",
   "type": "module",
   "main": "dist/index.js",
-  "bin": { "megaplan-mcp": "dist/index.js" },
-  "files": ["dist"],
-  "engines": { "node": ">=18.0.0" },
+  "bin": {
+    "megaplan-mcp": "dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
     "build": "tsc",
     "dev": "tsx src/index.ts",
@@ -22,11 +28,30 @@
     "tsx": "^4.19.0",
     "typescript": "^5.7.0"
   },
-  "publishConfig": { "access": "public" },
+  "publishConfig": {
+    "access": "public"
+  },
   "mcpName": "io.github.theYahia/megaplan-mcp",
-  "keywords": ["mcp", "mcp-server", "model-context-protocol", "claude", "ai", "russian-api", "megaplan", "tasks", "deals", "project-management"],
+  "keywords": [
+    "mcp",
+    "mcp-server",
+    "model-context-protocol",
+    "claude",
+    "ai",
+    "russian-api",
+    "megaplan",
+    "tasks",
+    "deals",
+    "project-management",
+    "api",
+    "typescript",
+    "crm"
+  ],
   "license": "MIT",
-  "repository": { "type": "git", "url": "https://github.com/theYahia/megaplan-mcp.git" },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/theYahia/megaplan-mcp.git"
+  },
   "homepage": "https://github.com/theYahia/megaplan-mcp#readme",
   "author": "Yahia"
 }
