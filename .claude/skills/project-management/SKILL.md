@@ -11,9 +11,16 @@ allowed-tools:
 
 ## Algorithm
 
-1. Use `get_tasks` to list tasks with filters by status and responsible
-2. Use `create_task` to add new tasks with deadlines
-3. Use `get_deals` to browse deals pipeline
+1. Use `get_tasks` (filter by status code(s) and `filter_responsible_id`) or `get_task` for one task.
+2. Use `create_task` / `update_task` to add or edit tasks (deadlines, responsible).
+3. Use `get_deals` / `get_deal` to browse the pipeline; `get_deal_programs` to find a `program_id`
+   before `create_deal`.
+4. Use `get_employees` to resolve responsible/employee IDs, `list_clients` for CRM contacts,
+   and `get_current_user` to scope "my" tasks.
+
+Notes:
+- `filter_status` takes account-specific status **codes** (e.g. `filter_any`), not names.
+- Lists are cursor-paginated: pass the returned `nextPageAfter` as `page_after`.
 
 ## Response Format
 
@@ -31,7 +38,8 @@ allowed-tools:
 ## Examples
 
 ```
-/project-management list tasks status active
+/project-management list my tasks
 /project-management create task "Review contract" responsible 1000005
+/project-management list deal pipelines
 /project-management list deals
 ```
