@@ -3,9 +3,10 @@
 MCP server for **Megaplan** project management. Tasks, deals, projects,
 employees, clients, and comments via Megaplan API v3.
 
-> **v2.0 is a breaking release.** Request/response shapes changed to match the
-> real v3 API, and `--http` now requires an auth token. See
-> [CHANGELOG.md](./CHANGELOG.md) and [Migrating from v1](#migrating-from-v1).
+> **v4.0 is a breaking release** (and the first npm release of this overhaul —
+> it supersedes the older 8-tool `3.0.0`). Request/response shapes changed to
+> match the real v3 API, and `--http` now requires an auth token. See
+> [CHANGELOG.md](./CHANGELOG.md) and [Migrating from older versions](#migrating-from-older-versions).
 
 ## Tools (18)
 
@@ -123,7 +124,9 @@ your own network controls.
 | `MCP_HTTP_MAX_SESSIONS` | No | Max concurrent sessions (default `100`) |
 | `MCP_HTTP_SESSION_TTL_MS` | No | Idle session eviction TTL (default 30 min) |
 
-## Migrating from v1
+## Migrating from older versions
+
+Applies to the previously published 8-tool builds (`1.x`–`3.0.0`):
 
 - `get_*` list tools: `offset` → `page_after` (cursor); `filter_status` now takes
   status **code(s)**, not names like `active`.

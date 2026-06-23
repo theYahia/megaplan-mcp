@@ -52,7 +52,7 @@ function wrapTool<P>(handler: (params: P) => Promise<string>) {
 export function createServer(): McpServer {
   const server = new McpServer({
     name: "megaplan-mcp",
-    version: "2.0.0",
+    version: "4.0.0",
   });
 
   // ── Tasks ──
