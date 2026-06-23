@@ -2,113 +2,100 @@
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { getTasksSchema, handleGetTasks, createTaskSchema, handleCreateTask } from "./tools/tasks.js";
-import { getDealsSchema, handleGetDeals, createDealSchema, handleCreateDeal } from "./tools/deals.js";
-import { getProjectsSchema, handleGetProjects } from "./tools/projects.js";
+import { fileURLToPath } from "node:url";
+import { realpathSync } from "node:fs";
+import { TOOL_COUNT, PROMPT_COUNT } from "./meta.js";
+import {
+  getTasksSchema, handleGetTasks,
+  getTaskSchema, handleGetTask,
+  createTaskSchema, handleCreateTask,
+  updateTaskSchema, handleUpdateTask,
+} from "./tools/tasks.js";
+import {
+  getDealsSchema, handleGetDeals,
+  getDealSchema, handleGetDeal,
+  createDealSchema, handleCreateDeal,
+  updateDealSchema, handleUpdateDeal,
+} from "./tools/deals.js";
+import { getProjectsSchema, handleGetProjects, getProjectSchema, handleGetProject } from "./tools/projects.js";
 import { getEmployeesSchema, handleGetEmployees } from "./tools/employees.js";
 import { getCommentsSchema, handleGetComments, createCommentSchema, handleCreateComment } from "./tools/comments.js";
+import {
+  getDealProgramsSchema, handleGetDealPrograms,
+  getDealProgramSchema, handleGetDealProgram,
+} from "./tools/programs.js";
+import {
+  listClientsSchema, handleListClients,
+  getClientSchema, handleGetClient,
+} from "./tools/contractors.js";
+import { getCurrentUserSchema, handleGetCurrentUser } from "./tools/me.js";
+import { MY_TASKS_TODAY, CREATE_DEAL_WIZARD, type PromptDef } from "./prompts.js";
+
+type ToolResult = {
+  content: { type: "text"; text: string }[];
+  isError?: boolean;
+};
+
+/** Wrap a tool handler so thrown errors become a clean isError result, not a transport error. */
+function wrapTool<P>(handler: (params: P) => Promise<string>) {
+  return async (params: P): Promise<ToolResult> => {
+    try {
+      return { content: [{ type: "text", text: await handler(params) }] };
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      console.error("[megaplan-mcp] tool error:", error);
+      return { content: [{ type: "text", text: `Error: ${message}` }], isError: true };
+    }
+  };
+}
 
 export function createServer(): McpServer {
   const server = new McpServer({
     name: "megaplan-mcp",
-    version: "1.1.0",
+    version: "4.0.0",
   });
 
   // ── Tasks ──
-  server.tool(
-    "get_tasks",
-    "List tasks from Megaplan with filters by status, responsible user, and search.",
-    getTasksSchema.shape,
-    async (params) => ({ content: [{ type: "text", text: await handleGetTasks(params) }] }),
-  );
-
-  server.tool(
-    "create_task",
-    "Create a new task in Megaplan with name, description, responsible user, and deadline.",
-    createTaskSchema.shape,
-    async (params) => ({ content: [{ type: "text", text: await handleCreateTask(params) }] }),
-  );
+  server.tool("get_tasks", "List tasks from Megaplan, filtered by status code(s), responsible user, and free-text search.", getTasksSchema.shape, wrapTool(handleGetTasks));
+  server.tool("get_task", "Get a single Megaplan task by ID with full details.", getTaskSchema.shape, wrapTool(handleGetTask));
+  server.tool("create_task", "Create a task in Megaplan with name, description, responsible user, and deadline.", createTaskSchema.shape, wrapTool(handleCreateTask));
+  server.tool("update_task", "Update an existing Megaplan task (name, description, responsible, deadline, status).", updateTaskSchema.shape, wrapTool(handleUpdateTask));
 
   // ── Deals ──
-  server.tool(
-    "get_deals",
-    "List deals from Megaplan with filters by status, responsible user, and search.",
-    getDealsSchema.shape,
-    async (params) => ({ content: [{ type: "text", text: await handleGetDeals(params) }] }),
-  );
-
-  server.tool(
-    "create_deal",
-    "Create a new deal in Megaplan with name, pipeline, responsible user, and amount.",
-    createDealSchema.shape,
-    async (params) => ({ content: [{ type: "text", text: await handleCreateDeal(params) }] }),
-  );
+  server.tool("get_deals", "List deals from Megaplan, filtered by status code(s), responsible user, and free-text search.", getDealsSchema.shape, wrapTool(handleGetDeals));
+  server.tool("get_deal", "Get a single Megaplan deal by ID with full details.", getDealSchema.shape, wrapTool(handleGetDeal));
+  server.tool("create_deal", "Create a deal in Megaplan. Requires a program (pipeline) ID — discover it via get_deal_programs.", createDealSchema.shape, wrapTool(handleCreateDeal));
+  server.tool("update_deal", "Update an existing Megaplan deal (name, responsible, amount, description, status).", updateDealSchema.shape, wrapTool(handleUpdateDeal));
 
   // ── Projects ──
-  server.tool(
-    "get_projects",
-    "List projects from Megaplan with filters by status and search.",
-    getProjectsSchema.shape,
-    async (params) => ({ content: [{ type: "text", text: await handleGetProjects(params) }] }),
-  );
+  server.tool("get_projects", "List projects from Megaplan, filtered by status code(s) and free-text search.", getProjectsSchema.shape, wrapTool(handleGetProjects));
+  server.tool("get_project", "Get a single Megaplan project by ID with full details.", getProjectSchema.shape, wrapTool(handleGetProject));
 
   // ── Employees ──
-  server.tool(
-    "get_employees",
-    "List employees from Megaplan with search and department filter.",
-    getEmployeesSchema.shape,
-    async (params) => ({ content: [{ type: "text", text: await handleGetEmployees(params) }] }),
-  );
+  server.tool("get_employees", "List employees from Megaplan with free-text search and department filter.", getEmployeesSchema.shape, wrapTool(handleGetEmployees));
+
+  // ── Deal programs (pipelines) ──
+  server.tool("get_deal_programs", "List deal programs (pipelines). Use this to find the program_id required by create_deal.", getDealProgramsSchema.shape, wrapTool(handleGetDealPrograms));
+  server.tool("get_deal_program", "Get a single deal program (pipeline) by ID.", getDealProgramSchema.shape, wrapTool(handleGetDealProgram));
+
+  // ── Clients (CRM contractors) ──
+  server.tool("list_clients", "List clients (CRM contractors): people (human) or organizations (company).", listClientsSchema.shape, wrapTool(handleListClients));
+  server.tool("get_client", "Get a single client (contractor) by type and ID.", getClientSchema.shape, wrapTool(handleGetClient));
+
+  // ── Current user ──
+  server.tool("get_current_user", "Get the authenticated user's employee record (experimental). Use it to scope 'my tasks'.", getCurrentUserSchema.shape, wrapTool(handleGetCurrentUser));
 
   // ── Comments ──
-  server.tool(
-    "get_comments",
-    "List comments for a task, deal, or project in Megaplan.",
-    getCommentsSchema.shape,
-    async (params) => ({ content: [{ type: "text", text: await handleGetComments(params) }] }),
-  );
-
-  server.tool(
-    "create_comment",
-    "Add a comment to a task, deal, or project in Megaplan.",
-    createCommentSchema.shape,
-    async (params) => ({ content: [{ type: "text", text: await handleCreateComment(params) }] }),
-  );
+  server.tool("get_comments", "List comments for a task, deal, or project in Megaplan.", getCommentsSchema.shape, wrapTool(handleGetComments));
+  server.tool("create_comment", "Add a comment to a task, deal, or project in Megaplan.", createCommentSchema.shape, wrapTool(handleCreateComment));
 
   // ── Skills (prompts) ──
-  server.prompt(
-    "my-tasks-today",
-    "Мои задачи на сегодня — shows your tasks due today or overdue",
-    {},
-    async () => ({
-      messages: [
-        {
-          role: "user" as const,
-          content: {
-            type: "text" as const,
-            text: "Используй get_tasks с filter_status='active' чтобы получить мои активные задачи. Покажи список задач с дедлайнами, отсортируй по срочности. Если задача просрочена — отметь. Формат: компактная таблица с колонками: Задача, Дедлайн, Статус, Приоритет.",
-          },
-        },
-      ],
-    }),
-  );
-
-  server.prompt(
-    "create-deal-wizard",
-    "Создай сделку — guided deal creation wizard",
-    {},
-    async () => ({
-      messages: [
-        {
-          role: "user" as const,
-          content: {
-            type: "text" as const,
-            text: "Помоги создать новую сделку в Мегаплане. Спроси у меня: 1) Название сделки, 2) ID программы (pipeline), 3) Ответственный (опционально), 4) Сумма (опционально), 5) Описание (опционально). После сбора данных вызови create_deal.",
-          },
-        },
-      ],
-    }),
-  );
+  const registerPrompt = (p: PromptDef) =>
+    server.prompt(p.name, p.description, {}, async () => ({
+      messages: [{ role: "user" as const, content: { type: "text" as const, text: p.text } }],
+    }));
+  registerPrompt(MY_TASKS_TODAY);
+  registerPrompt(CREATE_DEAL_WIZARD);
 
   return server;
 }
@@ -119,16 +106,29 @@ async function main() {
   if (args.includes("--http")) {
     const { startHttpServer } = await import("./http.js");
     const port = parseInt(process.env.PORT ?? "3000", 10);
-    await startHttpServer(createServer(), port);
+    await startHttpServer(createServer, port);
   } else {
     const server = createServer();
     const transport = new StdioServerTransport();
     await server.connect(transport);
-    console.error("[megaplan-mcp] Server started via stdio. 8 tools, 2 skills available.");
+    console.error(`[megaplan-mcp] Server started via stdio. ${TOOL_COUNT} tools, ${PROMPT_COUNT} skills available.`);
   }
 }
 
-main().catch((error) => {
-  console.error("[megaplan-mcp] Error:", error);
-  process.exit(1);
-});
+/** True when this file is being executed directly (not imported, e.g. by tests). */
+function isEntrypoint(): boolean {
+  const entry = process.argv[1];
+  if (!entry) return false;
+  try {
+    return realpathSync(entry) === realpathSync(fileURLToPath(import.meta.url));
+  } catch {
+    return false;
+  }
+}
+
+if (isEntrypoint()) {
+  main().catch((error) => {
+    console.error("[megaplan-mcp] Error:", error);
+    process.exit(1);
+  });
+}
