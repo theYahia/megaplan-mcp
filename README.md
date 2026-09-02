@@ -110,3 +110,7 @@ npm run start:http   # HTTP mode
 ## License
 
 MIT
+
+---
+
+Часть [WWmcp](https://github.com/theYahia/WWmcp) · Telegram: [@vhodvai](https://t.me/vhodvai)
