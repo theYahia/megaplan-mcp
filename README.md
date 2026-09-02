@@ -1,6 +1,8 @@
-# @theyahia/megaplan-mcp
+# MCP-сервер для Мегаплана — задачи, сделки и проекты через ИИ
 
-MCP server for **Megaplan** project management. Tasks, deals, projects, employees, comments via API v3.
+Если вы искали, как подключить Мегаплан к нейросети, ставить задачи и вести сделки не открывая интерфейс — это оно. 8 инструментов поверх API v3: задачи, сделки, проекты, сотрудники и комментарии, плюс 2 навыка — «мои задачи на сегодня» и мастер создания сделки. Пишете «создай сделку на 300 тысяч по этому контакту» — сделка появляется в Мегаплане.
+
+> MCP server for **Megaplan** project management. Tasks, deals, projects, employees, comments via API v3.
 
 ## Tools (8)
 
