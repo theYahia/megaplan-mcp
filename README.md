@@ -2,40 +2,40 @@
 
 Если вы искали, как подключить Мегаплан к нейросети, ставить задачи и вести сделки не открывая интерфейс — это оно. 8 инструментов поверх API v3: задачи, сделки, проекты, сотрудники и комментарии, плюс 2 навыка — «мои задачи на сегодня» и мастер создания сделки. Пишете «создай сделку на 300 тысяч по этому контакту» — сделка появляется в Мегаплане.
 
-> MCP server for **Megaplan** project management. Tasks, deals, projects, employees, comments via API v3.
+> MCP-сервер для системы управления проектами **Мегаплан**. Задачи, сделки, проекты, сотрудники и комментарии через API v3.
 
-## Tools (8)
+## Инструменты (8)
 
-| Tool | Description |
+| Инструмент | Описание |
 |------|------------|
-| `get_tasks` | List tasks with filters by status, responsible, search |
-| `create_task` | Create a task with name, description, deadline |
-| `get_deals` | List deals with filters |
-| `create_deal` | Create a deal with pipeline, amount, contact |
-| `get_projects` | List projects with filters |
-| `get_employees` | List employees with search, department filter |
-| `get_comments` | List comments on task/deal/project |
-| `create_comment` | Add a comment to task/deal/project |
+| `get_tasks` | Список задач с фильтрами по статусу, ответственному и поиском |
+| `create_task` | Создать задачу с названием, описанием и дедлайном |
+| `get_deals` | Список сделок с фильтрами |
+| `create_deal` | Создать сделку с воронкой, суммой и контактом |
+| `get_projects` | Список проектов с фильтрами |
+| `get_employees` | Список сотрудников с поиском и фильтром по отделу |
+| `get_comments` | Комментарии к задаче, сделке или проекту |
+| `create_comment` | Добавить комментарий к задаче, сделке или проекту |
 
-## Skills (Prompts)
+## Навыки (Skills / Prompts)
 
-| Skill | Description |
+| Навык | Описание |
 |-------|------------|
-| `my-tasks-today` | "Мои задачи на сегодня" — active tasks sorted by urgency |
-| `create-deal-wizard` | "Создай сделку" — guided deal creation |
+| `my-tasks-today` | «Мои задачи на сегодня» — активные задачи по срочности |
+| `create-deal-wizard` | «Создай сделку» — пошаговое создание сделки |
 
-## Setup
+## Настройка
 
-### Option A: Access Token
+### Вариант A: access-токен
 
-1. In Megaplan, go to **Settings > Integration > API**
-2. Generate an access token
+1. В Мегаплане откройте **Настройки → Интеграции → API**
+2. Сгенерируйте access-токен
 
-### Option B: Login + Password
+### Вариант B: логин и пароль
 
-Use your Megaplan login credentials (email + password).
+Используйте свои учётные данные Мегаплана (e-mail + пароль).
 
-## Usage with Claude Desktop
+## Подключение к Claude Desktop
 
 ```json
 {
@@ -52,7 +52,7 @@ Use your Megaplan login credentials (email + password).
 }
 ```
 
-Or with login/password:
+Либо через логин и пароль:
 
 ```json
 {
@@ -70,46 +70,46 @@ Or with login/password:
 }
 ```
 
-## Streamable HTTP Transport
+## Транспорт Streamable HTTP
 
-Run with `--http` flag for HTTP-based transport (useful for remote/cloud deployments):
+Запуск с флагом `--http` включает транспорт поверх HTTP (удобно для удалённых и облачных развёртываний):
 
 ```bash
 MEGAPLAN_DOMAIN=yourcompany MEGAPLAN_TOKEN=xxx npx @theyahia/megaplan-mcp --http
-# Listening on http://localhost:3000/mcp
+# Слушает http://localhost:3000/mcp
 ```
 
-Custom port via `PORT` env var.
+Свой порт задаётся переменной окружения `PORT`.
 
-## Environment Variables
+## Переменные окружения
 
-| Variable | Required | Description |
+| Переменная | Обяз. | Описание |
 |----------|----------|-------------|
-| `MEGAPLAN_DOMAIN` | Yes | Megaplan subdomain (e.g. `yourcompany`) |
-| `MEGAPLAN_TOKEN` | One of | Bearer access token |
-| `MEGAPLAN_LOGIN` | One of | Login email (if no token) |
-| `MEGAPLAN_PASSWORD` | One of | Password (if no token) |
-| `PORT` | No | HTTP port for `--http` mode (default: 3000) |
+| `MEGAPLAN_DOMAIN` | да | Поддомен Мегаплана (например, `yourcompany`) |
+| `MEGAPLAN_TOKEN` | одно из | Bearer access-токен |
+| `MEGAPLAN_LOGIN` | одно из | E-mail для входа (если нет токена) |
+| `MEGAPLAN_PASSWORD` | одно из | Пароль (если нет токена) |
+| `PORT` | нет | HTTP-порт для режима `--http` (по умолчанию 3000) |
 
-## Referral
+## Партнёрская программа
 
-Get **20-50% recurring** commission by referring Megaplan:
+Реферальное вознаграждение за приведённых клиентов Мегаплана — **20-50% на регулярной основе**:
 
-- [Megaplan Partner Program](https://megaplan.ru/partners/)
-- Sign up as a partner, get your referral link
-- Every client you bring = recurring revenue share
+- [Партнёрская программа Мегаплана](https://megaplan.ru/partners/)
+- Зарегистрируйтесь партнёром и получите реферальную ссылку
+- Каждый приведённый клиент — регулярная доля от его платежей
 
-## Development
+## Разработка
 
 ```bash
 npm install
 npm run build
 npm test
-npm run dev          # stdio mode with tsx
-npm run start:http   # HTTP mode
+npm run dev          # режим stdio через tsx
+npm run start:http   # режим HTTP
 ```
 
-## License
+## Лицензия
 
 MIT
 
